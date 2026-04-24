@@ -1,0 +1,467 @@
+Running with i = 0
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 1, need swap: 0
+Active del 1: 0, _active_index: 0
+terminate called after throwing an instance of 'std::filesystem::__cxx11::filesystem_error'
+  what():  filesystem error: cannot copy: No such file or directory [/mnt/nvmevirt/sift1m_index/500K_disk.index] [/mnt/nvmevirt/sift1m_index/500K_shadow1_disk.index]
+scripts/moti_long.sh: line 8: 12355 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 1
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611546046694500503, npts: 2910869816, dim: 2910896512 disk_nnodes: 139971600084072 disk_ndims: 139971732887400
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 12613 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 2
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611546047581198487, npts: 2019580216, dim: 2019606912 disk_nnodes: 139970708794472 disk_ndims: 139970846189416
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 12871 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 3
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611546121002920087, npts: 1616927032, dim: 1616953728 disk_nnodes: 139897291697256 disk_ndims: 139897424467816
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 13129 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 4
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 4141898040, dim: 4276488211 disk_nnodes: 140123154962744 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 13387 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 5
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 2980075832, dim: 3112568851 disk_nnodes: 140658864052536 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 13645 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 6
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 1191205176, dim: 1325795347 disk_nnodes: 140558290934072 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 13903 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 7
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 2011191608, dim: 2145781779 disk_nnodes: 140683664972088 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 14161 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 8
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611546287711111319, npts: 2407553336, dim: 2407580032 disk_nnodes: 139730578599016 disk_ndims: 139730716276584
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 14419 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 9
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 432036152, dim: 566626323 disk_nnodes: 139767257782584 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 14677 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 10
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 2415941944, dim: 2548434963 disk_nnodes: 140340472338744 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 14935 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 11
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 4219492664, dim: 59115539 disk_nnodes: 139925664061752 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 15193 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 12
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 2701154616, dim: 2835744787 disk_nnodes: 140491081406776 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 15451 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 13
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611545829137827991, npts: 1421891896, dim: 1421918592 disk_nnodes: 140189154438248 disk_ndims: 140189289559912
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 15709 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 14
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611545299945883799, npts: 2329958712, dim: 2329985408 disk_nnodes: 140718343482472 disk_ndims: 140718481504104
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 15967 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 15
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611546173547657367, npts: 614488376, dim: 614515072 disk_nnodes: 139844749651048 disk_ndims: 139844879730536
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 16225 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 16
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611686018427387902, npts: 3659553080, dim: 3794143251 disk_nnodes: 140303061244216 disk_ndims: 1
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 16483 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 17
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 1
+Active del 1: 1, _active_index: 1
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611546063295359127, npts: 3485489464, dim: 3485516160 disk_nnodes: 139954994834536 disk_ndims: 139955132028776
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_merge_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 16741 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
+Running with i = 18
+Merge size: 30000
+Lsearch: 20
+Lsearch: 30
+Lsearch: 40
+Lsearch: 50
+Lsearch: 60
+Lsearch: 80
+Lsearch: 100
+Loading queries 
+Reading bin file /mnt/nvmevirt/sift1m/sift1m_query.fbin at offset 0...Metadata: #pts = 10000, #dims = 128, aligned_dim = 128... Allocated 5120000bytes and copied data 
+Searching before inserts: 
+Need copy: 0, need swap: 0
+Active del 1: 0, _active_index: 0
+L2: Using AVX2 distance computation
+L2: Using AVX2 distance computation
+Disk-Index File Meta-data: # nodes per sector: 0, max node len (bytes): 0, max node degree: 4611546234456369303, npts: 4125120824, dim: 4125147520 disk_nnodes: 139783835774056 disk_ndims: 139783971018600
+Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+After single file index check, Tags offset: 0 PQ Pivots offset: 0 PQ Vectors offset: 0
+Reading bin file /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin ...
+Metadata: #pts = 1, #dims = 0...
+Load compressed vectors from file: /mnt/nvmevirt/sift1m_index/500K_shadow1_pq_compressed.bin offset: 0 num points: 1 n_chunks: 0
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+scripts/moti_long.sh: line 8: 16999 Aborted                 (core dumped) OMP_PLACES=cores OMP_PROC_BIND=close build/tests/motivation float /mnt/nvmevirt/sift1m/sift1m_base.fbin 128 96 1.2 500000 0 /mnt/nvmevirt/sift1m_index/500K /mnt/nvmevirt/sift1m/sift1m_query.fbin /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk 10 4 100 $i 30000 20 30 40 50 60 80 100
