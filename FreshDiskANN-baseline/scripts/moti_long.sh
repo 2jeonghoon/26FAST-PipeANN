@@ -1,15 +1,20 @@
 #!/bin/bash
-# /mnt/nvme2/DiskANN/scripts/moti_long.sh — SIFT1M 최종본
 
+# 이전 임시 파일 정리
 rm -f /mnt/nvmevirt/sift1m_index/500K_shadow*
 rm -f /mnt/nvmevirt/sift1m_index/500K_merge*
+rm -f /mnt/nvmevirt/sift1m_index/500Ktemp*
+rm -f /mnt/nvmevirt/sift1m_index/500K_mem*
 
-# 19회 반복, 각 ckpt에서 한 번 merge 후 재시작
+# 19회 반복 (i=0..18), merge 후 재시작
+EXE_NAME=${1:-motivation}
+echo "Using executable: $EXE_NAME"
+
 for i in {0..18}
 do
     echo "Running with i = $i"
     OMP_PLACES=cores OMP_PROC_BIND=close \
-    build/tests/motivation float \
+    build/tests/$EXE_NAME float \
         /mnt/nvmevirt/sift1m/sift1m_base.fbin \
         128 96 1.2 500000 0 \
         /mnt/nvmevirt/sift1m_index/500K \

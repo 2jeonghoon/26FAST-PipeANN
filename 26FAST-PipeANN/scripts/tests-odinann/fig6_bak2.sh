@@ -11,10 +11,6 @@ rm -f /mnt/nvmevirt/sift1m_index/500K_merge*
 mkdir -p data
 CWD=$(pwd)
 
-EXE="motivation"
-if [ "$1" == "ionice" ]; then
-    EXE="motivation_ionice"
-fi
+cd /home/FreshDiskANN-baseline/
+scripts/moti_long.sh |& tee $CWD/data/DiskANN-insertonly-sift1m.txt
 
-cd /home/tmp/FreshDiskANN-baseline/
-scripts/moti_long.sh $EXE |& tee $CWD/data/DiskANN-insertonly-sift1m.txt

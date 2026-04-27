@@ -103,7 +103,8 @@ void sync_search_kernel(T *query, size_t query_num, size_t query_dim, const int 
   float *gt_dists = NULL;
   size_t gt_num, gt_dim;
 
-  if (!file_exists(truthset_file)) {
+  if (calRecall && !file_exists(truthset_file)) {
+    LOG(INFO) << "Truthset file " << truthset_file << " is missing. Skipping recall for this search.";
     calRecall = false;
   }
 
@@ -150,11 +151,14 @@ void sync_search_kernel(T *query, size_t query_num, size_t query_dim, const int 
   std::chrono::duration<double> diff = e - s;
   float qps = (query_num / diff.count());
   float recall = 0;
+  std::string recall_display = "N/A";
 
   int current_time = globalTimer.elapsed() / 1.0e6f - begin_time;
   if (calRecall) {
     recall = pipeann::calculate_recall(query_num, gt_ids, gt_dists, gt_dim, query_result_tags, recall_at, recall_at);
+    recall_display = convertFloatToString(recall, 4);
     delete[] gt_ids;
+    delete[] gt_dists;
   }
 
   float mean_ios =
@@ -167,7 +171,7 @@ void sync_search_kernel(T *query, size_t query_num, size_t query_dim, const int 
             << (float) latency_stats[(_u64) (0.90 * ((double) query_num))] << std::setw(12)
             << (float) latency_stats[(_u64) (0.95 * ((double) query_num))] << std::setw(12)
             << (float) latency_stats[(_u64) (0.99 * ((double) query_num))] << std::setw(12)
-            << (float) latency_stats[(_u64) (0.999 * ((double) query_num))] << std::setw(12) << recall << std::setw(12)
+            << (float) latency_stats[(_u64) (0.999 * ((double) query_num))] << std::setw(12) << recall_display << std::setw(12)
             << mean_ios << std::endl;
 
   LOG(INFO) << "search current time: " << current_time;
@@ -306,6 +310,9 @@ void update(const std::string &data_bin, const unsigned L_disk, int vecs_per_ste
       } else if (insert_status == std::future_status::timeout) {
         ShowMemoryStatus(sync_index._disk_index_prefix_in);
         LOG(INFO) << "Number of vectors: " << sync_index._disk_index->cur_id;
+        LOG(INFO) << "Insert is still running. Running an interim search without recall; "
+                     "GT checkpoint stays at "
+                  << currentFileName;
         double dummy;
         // for (uint32_t j = 0; j < Lsearch.size(); ++j) {
         sync_search_kernel(query, query_num, query_dim, recall_at, search_mem_L, Lsearch[0], search_beam_width,
@@ -326,6 +333,7 @@ void update(const std::string &data_bin, const unsigned L_disk, int vecs_per_ste
 
     res += vecs_per_step;
     currentFileName = GetTruthFileName(truthset_file, res + truthset_l_offset);
+    LOG(INFO) << "Insertions complete. Advancing GT checkpoint to " << currentFileName;
 
     std::vector<double> disk_ios;
     for (size_t j = 0; j < Lsearch.size(); ++j) {

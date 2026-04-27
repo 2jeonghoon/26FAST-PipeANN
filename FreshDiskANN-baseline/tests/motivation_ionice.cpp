@@ -70,6 +70,8 @@ namespace {
 
   std::once_flag g_search_ionice_warning_once;
   std::once_flag g_insert_ionice_warning_once;
+  std::once_flag g_merge_ionice_warning_once;
+  std::once_flag g_main_ionice_warning_once;
 
   void set_thread_ionice(const char* thread_role, int io_class, int io_level,
                          std::once_flag& warning_once) {
@@ -102,11 +104,22 @@ namespace {
                       g_insert_ionice_warning_once);
   }
 
+  void set_merge_thread_ionice() {
+    set_thread_ionice("merge", IOPRIO_CLASS_BE, 0, g_merge_ionice_warning_once);
+  }
+
+  void set_main_thread_ionice() {
+    set_thread_ionice("main", IOPRIO_CLASS_BE, 0, g_main_ionice_warning_once);
+  }
+
 }  // namespace
 #endif
 
 // acutually also shows disk size
 void ShowMemoryStatus() {
+#ifndef _WINDOWS
+  set_main_thread_ionice();
+#endif
   int current_time = globalTimer.elapsed() / 1.0e6f - begin_time;
 
   int           tSize = 0, resident = 0, share = 0;
@@ -137,6 +150,9 @@ std::string GetTruthFileName(std::string& truthFilePrefix, int r_start) {
 template<typename T>
 inline uint64_t save_bin_test(const std::string& filename, T* id, float* dist,
                               size_t npts, size_t ndims, size_t offset = 0) {
+#ifndef _WINDOWS
+  set_main_thread_ionice();
+#endif
   std::ofstream writer;
   open_file_to_write(writer, filename);
 
@@ -166,6 +182,9 @@ void sync_search_kernel(T* query, size_t query_num, size_t query_aligned_dim,
                         diskann::MergeInsert<T, TagT>& sync_index,
                         std::string& truthset_file, bool merged,
                         bool calRecall) {
+#ifndef _WINDOWS
+  set_main_thread_ionice();
+#endif
   unsigned* gt_ids = NULL;
   float*    gt_dists = NULL;
   size_t    gt_num, gt_dim;
@@ -263,11 +282,17 @@ void sync_search_kernel(T* query, size_t query_num, size_t query_aligned_dim,
 
   delete[] query_result_dists;
   delete[] query_result_tags;
+#ifndef _WINDOWS
+  set_main_thread_ionice();
+#endif
 }
 
 template<typename T, typename TagT>
 void merge_kernel(diskann::MergeInsert<T, TagT>& sync_index,
                   std::string&                   save_path) {
+#ifndef _WINDOWS
+  set_merge_thread_ionice();
+#endif
   // sync_index.dummy_merge();
   //   ShowMemoryStatus();
   sync_index.final_merge();
@@ -336,6 +361,9 @@ template<typename T, typename TagT = uint32_t>
 void get_trace(std::string data_bin, uint64_t l_start, uint64_t r_start,
                uint64_t n, std::vector<TagT>& delete_tags,
                std::vector<TagT>& insert_tags, std::vector<T>& data_load) {
+#ifndef _WINDOWS
+  set_main_thread_ionice();
+#endif
   for (uint64_t i = l_start; i < l_start + n; ++i) {
     delete_tags.push_back(i);
   }
@@ -365,6 +393,9 @@ void update(const std::string& data_bin, const unsigned L_disk,
             std::string& truthset_file, const int recall_at,
             std::vector<_u64> Lsearch, const unsigned beam_width,
             diskann::Distance<T>* dist_cmp, int ckpt = 0) {
+#ifndef _WINDOWS
+  set_main_thread_ionice();
+#endif
   diskann::Parameters paras;
   paras.Set<unsigned>("L_mem", 128);
   paras.Set<unsigned>("R_mem", 64);
@@ -572,6 +603,10 @@ int main(int argc, char** argv) {
         << " <step> <ckpt> <Lsearch> <L2>" << std::endl;
     exit(-1);
   }
+
+#ifndef _WINDOWS
+  set_main_thread_ionice();
+#endif
 
   int         arg_no = 2;
   std::string data_bin = std::string(argv[arg_no++]);
