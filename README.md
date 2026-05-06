@@ -53,8 +53,8 @@ sudo apt install make cmake g++ libaio-dev libgoogle-perftools-dev \
   clang-format libboost-all-dev libmkl-full-dev libjemalloc-dev
 ```
 
-The workflow assumes Linux with NVMe SSD storage and the following local data
-paths:
+The workflow assumes Linux with NVMe SSD storage. The paths below are an
+nvmevirt-based example used in this local setup:
 
 ```text
 /mnt/nvmevirt/sift1m/
@@ -97,7 +97,8 @@ The binaries used below are created under:
 
 ## Prepare SIFT1M Files
 
-Skip this section if these files already exist:
+This example stores SIFT1M under `/mnt/nvmevirt`. Skip this section if these
+files already exist:
 
 ```text
 /mnt/nvmevirt/sift1m/sift1m_base.fbin
