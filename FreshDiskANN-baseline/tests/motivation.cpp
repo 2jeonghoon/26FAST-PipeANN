@@ -2,6 +2,7 @@
 
 #include "log.h"
 #include <index.h>
+#include <cstdlib>
 #include <cstddef>
 #include <future>
 #include <Neighbor_Tag.h>
@@ -22,6 +23,7 @@
 #include "math_utils.h"
 #include "partition_and_pq.h"
 #include "utils.h"
+#include "v2/thread_affinity.h"
 
 #ifndef _WINDOWS
 #include <sys/mman.h>
@@ -30,9 +32,12 @@
 #endif
 
 uint32_t Merge_Size = 0;
-#define NUM_INSERT_THREADS 24
+#define DISKANN_STRINGIFY_IMPL(x) #x
+#define DISKANN_STRINGIFY(x) DISKANN_STRINGIFY_IMPL(x)
 #define NUM_DELETE_THREADS 1
+#define NUM_INSERT_THREADS 2
 #define NUM_SEARCH_THREADS 32
+#define NUM_MERGE_THREADS 24
 #define InsertQPS 1200
 
 int            begin_time = 0;
@@ -134,18 +139,23 @@ void sync_search_kernel(T* query, size_t query_num, size_t query_aligned_dim,
                "==============="
             << std::endl;
   auto s = std::chrono::high_resolution_clock::now();
-#pragma omp parallel for num_threads(NUM_SEARCH_THREADS) schedule(dynamic)
-  for (int64_t i = 0; i < (int64_t) query_num; i++) {
-    auto qs = std::chrono::high_resolution_clock::now();
-    // stats[i].n_current_used = 8;
-    sync_index.search_sync(query + i * query_aligned_dim, recall_at, L,
-                           query_result_tags + i * recall_at,
-                           query_result_dists + i * recall_at, stats + i);
+#pragma omp parallel num_threads(NUM_SEARCH_THREADS)
+  {
+    diskann::thread_affinity::pin_search_thread(
+        static_cast<std::size_t>(omp_get_thread_num()));
+#pragma omp for schedule(dynamic)
+    for (int64_t i = 0; i < (int64_t) query_num; i++) {
+      auto qs = std::chrono::high_resolution_clock::now();
+      // stats[i].n_current_used = 8;
+      sync_index.search_sync(query + i * query_aligned_dim, recall_at, L,
+                             query_result_tags + i * recall_at,
+                             query_result_dists + i * recall_at, stats + i);
 
-    auto qe = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> diff = qe - qs;
-    latency_stats[i] = diff.count() * 1000;
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+      auto qe = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> diff = qe - qs;
+      latency_stats[i] = diff.count() * 1000;
+      std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
   }
   auto e = std::chrono::high_resolution_clock::now();
 
@@ -195,6 +205,7 @@ void sync_search_kernel(T* query, size_t query_num, size_t query_aligned_dim,
 template<typename T, typename TagT>
 void merge_kernel(diskann::MergeInsert<T, TagT>& sync_index,
                   std::string&                   save_path) {
+  diskann::thread_affinity::pin_merge_thread(0);
   // sync_index.dummy_merge();
   //   ShowMemoryStatus();
   sync_index.final_merge();
@@ -220,14 +231,19 @@ void insertion_kernel(T* data_load, diskann::MergeInsert<T, TagT>& sync_index,
     return (1000 * success) / dur.count();
   };
 
-#pragma omp parallel for num_threads(2)
-  for (_s64 i = 0; i < (_s64) insert_vec.size(); i++) {
-    diskann::Timer insert_timer;
-    sync_index.insert(data_load + aligned_dim * i, insert_vec[i]);
-    ++success;
-    insert_latencies[i] = ((double) insert_timer.elapsed());
-    while (getQPS() >= InsertQPS) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+#pragma omp parallel num_threads(NUM_INSERT_THREADS)
+  {
+    diskann::thread_affinity::pin_insert_thread(
+        static_cast<std::size_t>(omp_get_thread_num()));
+#pragma omp for
+    for (_s64 i = 0; i < (_s64) insert_vec.size(); i++) {
+      diskann::Timer insert_timer;
+      sync_index.insert(data_load + aligned_dim * i, insert_vec[i]);
+      ++success;
+      insert_latencies[i] = ((double) insert_timer.elapsed());
+      while (getQPS() >= InsertQPS) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
     }
   }
   float time_secs = timer.elapsed() / 1.0e6f;
@@ -296,8 +312,10 @@ void update(const std::string& data_bin, const unsigned L_disk,
   paras.Set<unsigned>("C", 384);
   paras.Set<unsigned>("beamwidth", beam_width);
   paras.Set<unsigned>("nodes_to_cache", 0);
-  paras.Set<unsigned>("num_search_threads",
-                      256);  // more for less contention of thread data.
+  paras.Set<unsigned>(
+      "num_search_threads",
+      NUM_SEARCH_THREADS);  // Keep internal search thread data in line with the
+                            // experiment setting.
   std::vector<T> data_load;
   size_t         dim{}, aligned_dim{};
 
@@ -318,55 +336,115 @@ void update(const std::string& data_bin, const unsigned L_disk,
   int               inMemorySize = 0;
   std::future<void> merge_future;
 
-  fprintf(stderr, "Need copy: %d, need swap: %d\n", ckpt == 0, ckpt % 2 != 0);
-  diskann::MergeInsert<T, TagT> sync_index(
-      paras, dim, save_path + "_mem", save_path, save_path + "_merge", dist_cmp,
-      metric, false, save_path, ckpt == 0, ckpt % 2 != 0, 0);
-
   int           total_npts_i32 = 0, total_dim_i32 = 0;
   std::ifstream total_reader(data_bin, std::ios::binary);
   total_reader.read((char*) &total_npts_i32, sizeof(int));
   total_reader.read((char*) &total_dim_i32, sizeof(int));
   total_reader.close();
 
-  uint64_t current_index_npts = sync_index._disk_index->num_points;
+  if (ckpt < 0) {
+    std::cerr << "ckpt must be non-negative" << std::endl;
+    exit(-1);
+  }
+
   uint64_t total_data_npts = static_cast<uint64_t>(total_npts_i32);
-  uint64_t base_index_npts =
-      base_num > 0 ? static_cast<uint64_t>(base_num) : current_index_npts;
+  uint64_t requested_ckpt = static_cast<uint64_t>(ckpt);
+  uint64_t completed_ckpts = requested_ckpt;
+  uint64_t base_index_npts = base_num > 0 ? static_cast<uint64_t>(base_num) : 0;
+  uint64_t total_insert_npts = 0;
+  uint64_t vecs_per_step = 0;
+  uint64_t batch = 0;
+  uint64_t ckpt_i = 0;
+  uint64_t res = 0;
+  uint32_t next_merge_size = Merge_Size;
+  double   merge_ratio = 0.0;
+
+  if (base_index_npts > 0) {
+    if (total_data_npts < base_index_npts) {
+      std::cerr << "data_bin has fewer points than the starting index"
+                << std::endl;
+      exit(-1);
+    }
+
+    total_insert_npts = total_data_npts - base_index_npts;
+    if (step <= 0 || total_insert_npts == 0 || total_insert_npts % step != 0) {
+      std::cerr << "Invalid step for current dataset/index sizes" << std::endl;
+      exit(-1);
+    }
+
+    vecs_per_step = total_insert_npts / step;
+    if (Merge_Size == 0 || Merge_Size % vecs_per_step != 0) {
+      std::cerr << "Merge size must be a positive multiple of vecs_per_step"
+                << std::endl;
+      exit(-1);
+    }
+
+    batch = total_insert_npts / vecs_per_step;
+    merge_ratio = ((double) Merge_Size / base_index_npts);
+    uint64_t tmp_npts = base_index_npts;
+    completed_ckpts = 0;
+
+    while (completed_ckpts < requested_ckpt) {
+      if (res + next_merge_size >= total_insert_npts) {
+        break;
+      }
+      res += next_merge_size;
+      ckpt_i += next_merge_size / vecs_per_step;
+      tmp_npts += next_merge_size;
+      ++completed_ckpts;
+      next_merge_size =
+          ((uint32_t)(merge_ratio * tmp_npts)) / vecs_per_step * vecs_per_step;
+    }
+  }
+
+  bool need_copy = (completed_ckpts == 0);
+  bool need_swap = (completed_ckpts % 2 != 0);
+  fprintf(stderr, "Need copy: %d, need swap: %d\n", need_copy, need_swap);
+  diskann::MergeInsert<T, TagT> sync_index(
+      paras, dim, save_path + "_mem", save_path, save_path + "_merge", dist_cmp,
+      metric, false, save_path, need_copy, need_swap, 0);
+
+  uint64_t current_index_npts = sync_index._disk_index->num_points;
+  if (base_index_npts == 0) {
+    base_index_npts = current_index_npts;
+    if (total_data_npts < base_index_npts) {
+      std::cerr << "data_bin has fewer points than the starting index"
+                << std::endl;
+      exit(-1);
+    }
+
+    total_insert_npts = total_data_npts - base_index_npts;
+    if (step <= 0 || total_insert_npts == 0 || total_insert_npts % step != 0) {
+      std::cerr << "Invalid step for current dataset/index sizes" << std::endl;
+      exit(-1);
+    }
+
+    vecs_per_step = total_insert_npts / step;
+    if (Merge_Size == 0 || Merge_Size % vecs_per_step != 0) {
+      std::cerr << "Merge size must be a positive multiple of vecs_per_step"
+                << std::endl;
+      exit(-1);
+    }
+
+    batch = total_insert_npts / vecs_per_step;
+    merge_ratio = ((double) Merge_Size / base_index_npts);
+    uint64_t tmp_npts = base_index_npts;
+    completed_ckpts = requested_ckpt;
+    ckpt_i = 0;
+    res = 0;
+    next_merge_size = Merge_Size;
+    for (uint64_t i = 0; i < completed_ckpts; ++i) {
+      res += next_merge_size;
+      ckpt_i += next_merge_size / vecs_per_step;
+      tmp_npts += next_merge_size;
+      next_merge_size =
+          ((uint32_t)(merge_ratio * tmp_npts)) / vecs_per_step * vecs_per_step;
+    }
+  }
 
   if (current_index_npts < base_index_npts) {
     std::cerr << "Current index has fewer points than num_start" << std::endl;
     exit(-1);
-  }
-  if (total_data_npts < base_index_npts) {
-    std::cerr << "data_bin has fewer points than the starting index"
-              << std::endl;
-    exit(-1);
-  }
-
-  uint64_t total_insert_npts = total_data_npts - base_index_npts;
-  if (step <= 0 || total_insert_npts == 0 || total_insert_npts % step != 0) {
-    std::cerr << "Invalid step for current dataset/index sizes" << std::endl;
-    exit(-1);
-  }
-
-  uint64_t vecs_per_step = total_insert_npts / step;
-  if (Merge_Size == 0 || Merge_Size % vecs_per_step != 0) {
-    std::cerr << "Merge size must be a positive multiple of vecs_per_step"
-              << std::endl;
-    exit(-1);
-  }
-
-  uint64_t batch = total_insert_npts / vecs_per_step;
-  double   merge_ratio = ((double) Merge_Size / base_index_npts);
-
-  uint64_t ckpt_i = 0, res = 0, tmp_npts = base_index_npts;
-  for (int i = 0; i < ckpt; ++i) {
-    res += Merge_Size;
-    ckpt_i += Merge_Size / vecs_per_step;
-    tmp_npts += Merge_Size;
-    Merge_Size =
-        ((uint32_t)(merge_ratio * tmp_npts)) / vecs_per_step * vecs_per_step;
   }
 
   if (base_index_npts + res != current_index_npts) {
@@ -379,6 +457,12 @@ void update(const std::string& data_bin, const unsigned L_disk,
     exit(-1);
   }
 
+  if (requested_ckpt > completed_ckpts) {
+    std::cout << "All insert checkpoints already completed." << std::endl;
+    exit(0);
+  }
+
+  Merge_Size = next_merge_size;
   uint64_t index_npts = current_index_npts;
   sync_index.init_mem_index(Merge_Size);
   LOG(INFO) << "index npts: " << index_npts
@@ -390,7 +474,7 @@ void update(const std::string& data_bin, const unsigned L_disk,
   LOG(INFO) << "Merge size is set to " << Merge_Size;
   // exit(0);
 
-  if (ckpt_i == 0 && ckpt != 0) {
+  if (ckpt_i == 0 && completed_ckpts != 0) {
     std::cerr << "ckpt_i is 0, please check ckpt and Merge_Size" << std::endl;
     exit(-1);
   }
@@ -493,6 +577,14 @@ int main(int argc, char** argv) {
         << " <step> <ckpt> <Lsearch> <L2>" << std::endl;
     exit(-1);
   }
+
+#ifdef DISKANN_ENABLE_CPU_ISOLATION_EXPERIMENT
+  setenv(diskann::thread_affinity::kAffinityEnableEnv, "1", 1);
+  setenv(diskann::thread_affinity::kSearchRoleCpusEnv, "0-14", 1);
+  setenv(diskann::thread_affinity::kInsertRoleCpusEnv, "15-29", 1);
+  setenv(diskann::thread_affinity::kMergeRoleCpusEnv, "15-29", 1);
+#endif
+  setenv("DISKANN_MERGE_THREADS", DISKANN_STRINGIFY(NUM_MERGE_THREADS), 1);
 
   int         arg_no = 2;
   std::string data_bin = std::string(argv[arg_no++]);

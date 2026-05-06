@@ -2,11 +2,13 @@
 #include "timer.h"
 #include "tsl/robin_map.h"
 #include "tsl/robin_set.h"
+#include "v2/thread_affinity.h"
 #include "utils.h"
 #include "v2/index_merger.h"
 #include <algorithm>
 #include <cassert>
 #include <csignal>
+#include <cstdlib>
 #include <iterator>
 #include <mutex>
 #include <thread>
@@ -33,6 +35,24 @@
 #define PQ_FLASH_INDEX_MAX_NODES_TO_CACHE 200000
 
 namespace diskann {
+  namespace {
+    uint32_t get_merge_thread_count(const uint32_t default_threads) {
+      const char *value = std::getenv("DISKANN_MERGE_THREADS");
+      if (value == nullptr || *value == '\0') {
+        return default_threads;
+      }
+
+      char *end = nullptr;
+      const long parsed = std::strtol(value, &end, 10);
+      if (end == value || *end != '\0' || parsed <= 0) {
+        return default_threads;
+      }
+
+      return std::min<uint32_t>(default_threads,
+                                static_cast<uint32_t>(parsed));
+    }
+  }  // namespace
+
   template<typename T, typename TagT>
   StreamingMerger<T, TagT>::StreamingMerger(
       const uint32_t ndims, Distance<T> *dist, diskann::Metric dist_metric,
@@ -95,33 +115,38 @@ namespace diskann {
       const uint32_t                  offset = this->offset_ids[i];
       const uint32_t                  count = this->mem_npts[i];
 // TODO (perf) :: trivially parallelizes ??
-#pragma omp parallel for schedule(dynamic, 1) num_threads(MAX_N_THREADS)
-      // iteratively insert each point into full index
-      for (int32_t j = 0; j < (int32_t) count; j++) {
-        // filter out -- `j` is deleted
-        if (deleted_set.find((uint32_t) j) != deleted_set.end()) {
-          continue;
-        }
+      #pragma omp parallel num_threads(get_merge_thread_count(MAX_N_THREADS))
+      {
+        diskann::thread_affinity::pin_merge_thread(
+            static_cast<std::size_t>(omp_get_thread_num()));
+      #pragma omp for schedule(dynamic, 1)
+        // iteratively insert each point into full index
+        for (int32_t j = 0; j < (int32_t) count; j++) {
+          // filter out -- `j` is deleted
+          if (deleted_set.find((uint32_t) j) != deleted_set.end()) {
+            continue;
+          }
 
-        // data for jth point
-        const T *j_coords =
-            coords + ((uint64_t) (this->aligned_ndims) * (uint64_t) j);
-        const uint32_t j_id = offset + (uint32_t) j;
+          // data for jth point
+          const T *j_coords =
+              coords + ((uint64_t) (this->aligned_ndims) * (uint64_t) j);
+          const uint32_t j_id = offset + (uint32_t) j;
 
-        // get renamed ID
-        const uint32_t j_renamed = this->rename(j_id);
-        assert(j_renamed != std::numeric_limits<uint32_t>::max());
+          // get renamed ID
+          const uint32_t j_renamed = this->rename(j_id);
+          assert(j_renamed != std::numeric_limits<uint32_t>::max());
 
-        // compute PQ coords
-        std::vector<uint8_t> j_pq_coords =
-            this->disk_index->deflate_vector(j_coords);
-        //        std::vector<uint8_t> j_pq_coords(this->pq_nchunks,0);
+          // compute PQ coords
+          std::vector<uint8_t> j_pq_coords =
+              this->disk_index->deflate_vector(j_coords);
+          //        std::vector<uint8_t> j_pq_coords(this->pq_nchunks,0);
 
-        // directly copy into PQFlashIndex PQ data
+          // directly copy into PQFlashIndex PQ data
         const uint64_t j_pq_offset =
             (uint64_t) j_renamed * (uint64_t) this->pq_nchunks;
         memcpy(this->pq_data + j_pq_offset, j_pq_coords.data(),
                this->pq_nchunks * sizeof(uint8_t));
+        }
       }
     }
 
@@ -163,17 +188,21 @@ namespace diskann {
 
 #endif
       diskann::Timer timer;
-#pragma omp parallel for schedule(dynamic, 1) num_threads(MAX_INSERT_THREADS)
-      // iteratively insert each point into full index
-      for (int32_t j = 0; j < (int32_t) count; j++) {
-        // filter out -- `j` is deleted
-        if (deleted_set.find((uint32_t) j) != deleted_set.end()) {
-          continue;
-        }
+      #pragma omp parallel num_threads(get_merge_thread_count(MAX_INSERT_THREADS))
+      {
+        diskann::thread_affinity::pin_merge_thread(
+            static_cast<std::size_t>(omp_get_thread_num()));
+      #pragma omp for schedule(dynamic, 1)
+        // iteratively insert each point into full index
+        for (int32_t j = 0; j < (int32_t) count; j++) {
+          // filter out -- `j` is deleted
+          if (deleted_set.find((uint32_t) j) != deleted_set.end()) {
+            continue;
+          }
 
-        if (((j % 100000) == 0) && (j > 0)) {
-          diskann::cout << "Finished inserting " << j << " points" << std::endl;
-          std::cout << "When j = " << j
+          if (((j % 100000) == 0) && (j > 0)) {
+            diskann::cout << "Finished inserting " << j << " points" << std::endl;
+            std::cout << "When j = " << j
                     << " elapsed time: " << timer.elapsed() / 1000000 << "s"
                     << std::endl;
         }
@@ -184,6 +213,7 @@ namespace diskann {
 
         // insert into index
         this->insert_mem_vec(j_coords, j_id);
+        }
       }
     }
 
@@ -532,14 +562,19 @@ namespace diskann {
     while (start_id < this->disk_npts) {
       new_start_id = this->disk_index->merge_read(disk_nodes, start_id,
                                                   SECTORS_PER_MERGE, buf);
-#pragma omp parallel for schedule(dynamic, 128) num_threads(MAX_N_THREADS)
-      for (int64_t i = 0; i < (int64_t) disk_nodes.size(); i++) {
-        // get thread-specific scratch
-        int      omp_thread_no = omp_get_thread_num();
-        uint8_t *pq_coord_scratch = this->thread_bufs[omp_thread_no];
-        assert(pq_coord_scratch != nullptr);
-        DiskNode<T> &disk_node = disk_nodes[i];
-        this->consolidate_deletes(disk_node, pq_coord_scratch);
+      #pragma omp parallel num_threads(get_merge_thread_count(MAX_N_THREADS))
+      {
+        diskann::thread_affinity::pin_merge_thread(
+            static_cast<std::size_t>(omp_get_thread_num()));
+      #pragma omp for schedule(dynamic, 128)
+        for (int64_t i = 0; i < (int64_t) disk_nodes.size(); i++) {
+          // get thread-specific scratch
+          int      omp_thread_no = omp_get_thread_num();
+          uint8_t *pq_coord_scratch = this->thread_bufs[omp_thread_no];
+          assert(pq_coord_scratch != nullptr);
+          DiskNode<T> &disk_node = disk_nodes[i];
+          this->consolidate_deletes(disk_node, pq_coord_scratch);
+        }
       }
       for (auto &disk_node : disk_nodes) {
         if (this->is_deleted(disk_node)) {
@@ -1017,17 +1052,21 @@ namespace diskann {
       memset(buf, 0, SECTORS_PER_MERGE * SECTOR_LEN);
       new_start_id = this->disk_index->merge_read(disk_nodes, start_id,
                                                   SECTORS_PER_MERGE, buf);
-#pragma omp parallel for schedule(dynamic, 128) num_threads(MAX_N_THREADS)
-      for (int64_t idx = 0; idx < (int64_t) disk_nodes.size(); idx++) {
-        // get thread-specific scratch
-        int      omp_thread_no = omp_get_thread_num();
-        uint8_t *thread_scratch = this->thread_bufs[omp_thread_no];
+      #pragma omp parallel num_threads(get_merge_thread_count(MAX_N_THREADS))
+      {
+        diskann::thread_affinity::pin_merge_thread(
+            static_cast<std::size_t>(omp_get_thread_num()));
+      #pragma omp for schedule(dynamic, 128)
+        for (int64_t idx = 0; idx < (int64_t) disk_nodes.size(); idx++) {
+          // get thread-specific scratch
+          int      omp_thread_no = omp_get_thread_num();
+          uint8_t *thread_scratch = this->thread_bufs[omp_thread_no];
 
-        DiskNode<T> &disk_node = disk_nodes[idx];
-        uint32_t     id = disk_node.id;
+          DiskNode<T> &disk_node = disk_nodes[idx];
+          uint32_t     id = disk_node.id;
 
-        std::vector<uint32_t> nhood;
-        std::vector<uint32_t> deltas;
+          std::vector<uint32_t> nhood;
+          std::vector<uint32_t> deltas;
         uint32_t              offset_id = this->rename_inverse(id);
         // replaced by new vector, copy coords and proceed as normal
         if (offset_id != std::numeric_limits<uint32_t>::max()) {
@@ -1096,6 +1135,7 @@ namespace diskann {
             lcounts++;
         }
         counts += lcounts;
+        }
       }
 
       cur_offset += SECTORS_PER_MERGE * SECTOR_LEN;

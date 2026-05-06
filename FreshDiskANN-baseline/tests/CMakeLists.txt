@@ -125,6 +125,9 @@ target_link_libraries(overall_performance ${PROJECT_NAME} jemalloc aio)
 add_executable(motivation motivation.cpp)
 target_link_libraries(motivation ${PROJECT_NAME} jemalloc aio)
 
+add_executable(motivation_affinity motivation_affinity.cpp)
+target_link_libraries(motivation_affinity ${PROJECT_NAME} jemalloc aio)
+
 add_executable(motivation_ionice motivation_ionice.cpp)
 target_link_libraries(motivation_ionice ${PROJECT_NAME} jemalloc aio)
 

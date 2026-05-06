@@ -10,11 +10,16 @@ rm -f /mnt/nvmevirt/sift1m_index/500K_mem*
 EXE_NAME=${1:-motivation}
 echo "Using executable: $EXE_NAME"
 
+RUN_PREFIX=()
+if [ "$EXE_NAME" = "motivation_affinity" ]; then
+    RUN_PREFIX=(taskset -c 0-29)
+fi
+
 for i in {0..18}
 do
     echo "Running with i = $i"
-    OMP_PLACES=cores OMP_PROC_BIND=close \
-    build/tests/$EXE_NAME float \
+    OMP_PLACES=cores OMP_PROC_BIND=false \
+    "${RUN_PREFIX[@]}" build/tests/$EXE_NAME float \
         /mnt/nvmevirt/sift1m/sift1m_base.fbin \
         128 96 1.2 500000 0 \
         /mnt/nvmevirt/sift1m_index/500K \

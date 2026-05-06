@@ -28,7 +28,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/include/
 
 add_compile_options(-g -O3)
 add_definitions(
-	-DUSE_AIO
+	# -DUSE_AIO
 	# -DDUMMY_STRESS
 )
 include_directories(
