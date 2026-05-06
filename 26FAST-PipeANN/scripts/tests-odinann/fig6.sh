@@ -12,9 +12,14 @@ mkdir -p data
 CWD=$(pwd)
 
 EXE="motivation"
+OUT_FILE="DiskANN-insertonly-sift1m.txt"
 if [ "$1" == "ionice" ]; then
     EXE="motivation_ionice"
+    OUT_FILE="DiskANN-insertonly-sift1m_ionice.txt"
+elif [ "$1" == "affinity" ]; then
+    EXE="motivation_affinity"
+    OUT_FILE="DiskANN-insertonly-sift1m_affinity.txt"
 fi
 
-cd /home/tmp/FreshDiskANN-baseline/
-scripts/moti_long.sh $EXE |& tee $CWD/data/DiskANN-insertonly-sift1m.txt
+cd /home/jhlee/FreshDiskANN-baseline/
+scripts/moti_long.sh $EXE |& tee $CWD/data/$OUT_FILE

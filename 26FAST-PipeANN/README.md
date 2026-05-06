@@ -223,6 +223,50 @@ Please prepare datasets and run PipeANN first, by referring to [Quick Start (Sea
 Differently, `-DREAD_ONLY_TESTS` and `-DNO_MAPPING` flags should be disabled.
 The in-memory index is optional.
 
+### SIFT1M 500K Preparation Order
+
+The following commands prepare the SIFT1M 500K insert-only setup used by the local scripts.
+Run them from the repository root after building the binaries.
+The paths assume that `sift1m_base.fbin`, `sift1m_query.fbin`, and `500K.fbin` already exist under `/mnt/nvmevirt/sift1m`.
+This setup has been verified only for running `scripts/tests-odinann/fig6.sh`.
+
+0. Compute the top-1000 ground truth over the full SIFT1M base set.
+
+```bash
+build/tests/utils/compute_groundtruth float \
+    /mnt/nvmevirt/sift1m/sift1m_base.fbin \
+    /mnt/nvmevirt/sift1m/sift1m_query.fbin \
+    1000 \
+    /mnt/nvmevirt/sift1m/sift1m_truth1000.bin
+```
+
+1. Generate per-step top-k ground-truth files for a 500K initial index and insert-only updates.
+
+```bash
+build/tests/gt_update \
+  /mnt/nvmevirt/sift1m/sift1m_truth1000.bin \
+  1000000 \
+  500000 \
+  10 \
+  /mnt/nvmevirt/sift1m_gnd_diskann/500K_topk \
+  1
+```
+
+2. Build the 500K on-disk index.
+
+```bash
+build/tests/build_disk_index float \
+  /mnt/nvmevirt/sift1m/500K.fbin \
+  /mnt/nvmevirt/sift1m_index/500K \
+  96 128 0.05 64 20 l2 0
+```
+
+3. Generate identity tags for the 500K index.
+
+```bash
+build/tests/gen_tags float /mnt/nvmevirt/sift1m/500K.fbin /mnt/nvmevirt/sift1m_index/500K false
+```
+
 ### Prepare Tags (Optional)
 
 Each vector corresponds to one tag, which does not change during updates (but its ID and location on disk may change).
